@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>Cache Client</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+		<script	src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+		<script>
+			$(function() {
+				$("#cacheGet").click(function(e) {
+					e.preventDefault();
+					$.ajax({
+						type: 'GET',
+						url: 'http://localhost:8080/cache/entries',
+						data: { key: $("#key").val() },
+						dataType: 'json',
+						success: function (data) {
+							$("#value").val(data.value);
+							$("#version").val(data.versionId);
+						},
+						error: function() {
+							$("#value").val('-- No data found --');
+							$("#version").val('-- No data found --');
+						}
+					});
+				});
+
+				$("#cachePut").click(function(e) {
+					e.preventDefault();
+					var json = {
+						key: $("#key").val(),
+						value: $("#value").val()
+					};
+					$.ajax({
+						type: 'PUT',
+						url: 'http://localhost:8080/cache/entries',
+						data : JSON.stringify(json),
+						contentType: "application/json; charset=utf-8",
+						success: function() {
+							alert("Value has been added");
+							$("#value").val('');
+							$("#version").val('');
+						}
+					});
+				});
+
+                $("#refreshStats").click(function(e) {
+                    e.preventDefault();
+                    $.ajax({
+                        type: 'GET',
+                        url: 'http://localhost:8080/cache/stats',
+                        dataType: 'json',
+                        success: function (data) {
+                            $("#hits").val(data.hits);
+                            $("#misses").val(data.misses);
+                            $("#size").val(data.size);
+                        }
+                    });
+                });
+			});
+		</script>
+	</head>
+	<body>
+		<div class="container">
+			<div class="row">
+				<div class="col-4">
+					<h3>CACHE VALUES</h3>
+					<form>
+						<div class="form-group">
+							<label for="key">Key</label>
+							<input class="form-control" id="key">
+						</div>
+						<div class="form-group">
+							<label for="value">Value</label>
+							<input class="form-control" id="value">
+						</div>
+						<div class="form-group">
+							<label for="version">Value</label>
+							<input class="form-control" id="version" readonly>
+						</div>
+						<button id="cachePut" class="btn btn-primary">Put</button>
+						<button id="cacheGet" class="btn btn-primary">Get</button>
+					</form>
+				</div>
+				<div class="col-4">
+					<h3>CACHE STATS</h3>
+					<form>
+						<div class="form-group">
+							<label for="hits">Hits</label>
+							<input class="form-control" id="hits" readonly>
+						</div>
+						<div class="form-group">
+							<label for="misses">Misses</label>
+							<input class="form-control" id="misses" readonly>
+						</div>
+						<div class="form-group">
+							<label for="size">Size</label>
+							<input class="form-control" id="size" readonly>
+						</div>
+						<button id="refreshStats" class="btn btn-primary">Refresh</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
+
+
